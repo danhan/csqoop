@@ -1,0 +1,1 @@
+sqoop import --connect jdbc:mysql://localhost/hcaschedule --username root --password zhu88jie --query 'select * from Service where $CONDITIONS' --split-by Service$PersistentID --target-dir . 

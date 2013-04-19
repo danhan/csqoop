@@ -1,0 +1,20 @@
+sqoop import --connect jdbc:mysql://localhost/hcaschedule --username root --password zhu88jie \
+--query "SELECT concat(HCA\$userName,'-',HCA\$PersistentID) as row_key,
+HCA\$calendarID,HCA\$cellNumber,HCA\$firstName,HCA\$hasVehicle,
+HCA\$homeNumber,HCA\$lastName,HCA\$lat,HCA\$lon,HCA\$PASSWORD,
+HCA\$userName,
+PersistentAddress\$PCode,
+PersistentAddress\$city,
+PersistentAddress\$country,
+PersistentAddress\$latitude,
+PersistentAddress\$longituted,
+PersistentAddress\$province,
+PersistentAddress\$street
+FROM HCA h
+LEFT JOIN PersistentAddress p
+ON h.HCA\$PersistentID = p.R_HCA 
+WHERE \$CONDITIONS" \
+--map-column-java row_key=String \
+--split-by 'HCA$firstName' \
+--hbase-table hca  --hbase-row-key 'row_key' \
+--column-family d --target-dir /home/ubuntu/hca
