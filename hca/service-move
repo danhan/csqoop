@@ -1,6 +1,6 @@
 sqoop import --connect jdbc:mysql://localhost/hcaschedule --username root --password zhu88jie \
 --verbose \
---query 'SELECT Service$PersistentID, Service$description, Service$duration, Service$NAME FROM Service where $CONDITIONS' \
+--query 'SELECT Service$PersistentID, des, d, nm from (SELECT Service$PersistentID, Service$description as des, Service$duration as d, Service$NAME as nm FROM Service) as changedService where $CONDITIONS' \
 --split-by 'Service$PersistentID' \
 --hbase-table service  --hbase-row-key 'Service$PersistentID' \
---column-family d --target-dir /home/ubuntu/hca
+--column-family d --target-dir /home/ubuntu/csqoop/hca
