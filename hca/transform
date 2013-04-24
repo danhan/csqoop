@@ -1,0 +1,8 @@
+sqoop import -libjars mysqoop.jar -D sqoop.hbase.insert.put.transformer.class=org.apache.sqoop.hbase.STModelPutTransformer \
+--connect jdbc:mysql://localhost/hcaschedule --username root --password zhu88jie \
+--verbose \
+--query 'SELECT Service$PersistentID, des, d, nm from (SELECT Service$PersistentID, Service$description as des, Service$duration as d, Service$NAME as nm FROM Service) as changedService where $CONDITIONS' \
+--split-by 'Service$PersistentID' \
+--hbase-table transformer  --hbase-row-key 'Service$PersistentID' \
+--column-family d --target-dir /home/ubuntu/csqoop/hca \
+--hbase-create-table
