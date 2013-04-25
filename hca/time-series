@@ -1,0 +1,24 @@
+sqoop import -libjars mysqoop.jar -D sqoop.hbase.insert.put.transformer.class=org.apache.sqoop.hbase.TimeSeriesPutTransformer \
+--connect jdbc:mysql://localhost/hcaschedule --username root --password zhu88jie \
+--verbose \
+--query "SELECT s.Schedule\$startDate AS sweek, (CASE WHEN appID IS NOT NULL THEN appID ELSE 0 END) AS weekdayID, wday,block,startMin,lattd,longtd FROM hcaschedule.Schedule s 
+LEFT JOIN
+(
+SELECT CONCAT(R_HCA,'-',R_Patient) AS appID,
+Appointment\$WEEKDAY AS wday,
+Appointment\$block AS block,
+Appointment\$startMinute AS startMin,
+R_Schedule,
+HCA\$lat AS lattd,
+HCA\$lon AS longtd
+FROM Appointment a,HCA h
+WHERE a.R_HCA=h.HCA\$PERSISTENTID
+) AS advancedAPP
+ON s.Schedule\$PersistentID=advancedAPP.R_Schedule
+WHERE \$CONDITIONS
+" \
+--split-by 'wday' \
+--map-column-java weekdayID=String \
+--hbase-table timeseries  --hbase-row-key '(Schedule$startDate,weekdayID)' \
+--column-family "d#wday#block" --target-dir /home/ubuntu/csqoop/hca \
+--hbase-create-table
