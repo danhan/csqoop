@@ -1,0 +1,27 @@
+sqoop import -libjars mysqoop.jar -D sqoop.hbase.insert.put.transformer.class=org.apache.sqoop.hbase.GeospatialPutTransformer \
+--connect jdbc:mysql://localhost/hcaschedule --username root --password zhu88jie \
+--verbose \
+--query "
+select ID, alerts, ccEmail, ccName, ccPhone, cellNum, emailAdd, emergAddr, emergName, emergPhone, emergeRelation, extraInfo,
+lattd, longtd, homeNum, medicalHis, risks, socialHis, pCode, city, country, province, street, splitter from 
+(SELECT concat(Patient\$firstName,'-',Patient\$lastName) as ID,
+Patient\$PersistentID as splitter,
+Patient\$alerts as alerts,Patient\$ccEmail as ccEmail,
+Patient\$ccName AS ccName,Patient\$ccPhone as ccPhone,
+Patient\$cellNumber as cellNum,Patient\$emailAddress as emailAdd,
+Patient\$emergAddr as emergAddr,Patient\$emergName as emergName,
+Patient\$emergPhone as emergPhone,Patient\$emergRelation as emergeRelation,Patient\$extraInformation as extraInfo,
+PersistentAddress\$latitude as lattd,PersistentAddress\$longituted as longtd,
+Patient\$homeNumber as homeNum,Patient\$medicalHistory as medicalHis,Patient\$risks as risks,
+Patient\$socialHistory as socialHis,PersistentAddress\$PCode as pCode,
+PersistentAddress\$city as city,PersistentAddress\$country as country,
+PersistentAddress\$province as province,PersistentAddress\$street as street
+FROM Patient p
+LEFT JOIN PersistentAddress pt ON p.Patient\$PersistentID = pt.R_Patient
+) as tmp
+WHERE \$CONDITIONS
+" \
+--split-by 'splitter' \
+--hbase-table geospatial  --hbase-row-key "(ID,lattd,longtd)" \
+--column-family "d" --target-dir /home/ubuntu/csqoop/hca \
+--hbase-create-table
