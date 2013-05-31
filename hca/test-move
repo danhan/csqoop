@@ -1,1 +1,1 @@
-sqoop import --connect jdbc:mysql://localhost/hcaschedule --username root --password zhu88jie --query 'select * from Service where $CONDITIONS' --split-by Service$PersistentID --target-dir . 
+sqoop import -libjars mysqoop.jar -D sqoop.hbase.insert.put.transformer.class=org.apache.sqoop.hbase.STModelPutTransformer --connect jdbc:mysql://localhost/hcaschedule --username root --password zhu88jie --verbose --query 'select * from Service where $CONDITIONS' --split-by 'Service$PersistentID' --hbase-table test column-family d --hbase-create-table
